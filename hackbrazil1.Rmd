@@ -1,0 +1,91 @@
+---
+title: "hackbrazil1"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+### phylopic
+
+```{r}
+devtools::install_github("sckott/rphylopic")
+library('rphylopic')
+
+
+sp_names <- c("giant anteater",
+              "blue macaw",
+              "maned sloth",
+              "wooly spider monkey",
+              "golden lion tamerin",
+              "golden toad")
+
+
+tst <- name_search(text = "Homo sapiens")
+
+phylo_rec <- name_search(text = "giant anteater")
+img <- image_data(phylo_rec[1], size = 128)[[1]]
+
+
+
+
+img <- image_data("27356f15-3cf8-47e8-ab41-71c6260b2724", size = "512")[[1]]
+
+cat <- image_data("23cd6aa4-9587-4a2e-8e26-de42885004c9", size = 128)[[1]]
+posx <- runif(50, 0, 1)
+posy <- runif(50, 0, 1)
+size <- runif(50, 0.01, 0.2)
+plot(posx, posy, type = "n", main = "A cat herd")
+for (i in 1:50) {
+  add_phylopic_base(cat, posx[i], posy[i], size[i])
+}
+
+
+
+
+
+
+```
+
+
+
+### brazil map
+```{r}
+library(rworldmap)
+
+
+```
+
+
+~ ggplot or base ? 3 circles overlapping
+~ how would we specify the location and size of the circles
+~ how would we get the size & location of the circle to change according to a param value ?
+~ if I use ggplot then I could potentially use gganimate 
+~ but if I do in ggplot then might be trickier to work out the overlap & plotting the map ?
+
+~ May want to create the polygons first, if I want to calculate their overlaps ?
+~ that would give me the flexibility to do on different shaped polygons later.
+
+
+#simple base example
+
+
+xs <- c(1,1.1,1.05) 
+ys <- c(1,1,1.2)
+radii <- c(0.01,0.01,0.01) #apart
+#radii <- c(0.05,0.05,0.05) #2 together
+#radii <- c(0.07,0.07,0.07) #3 together
+radii <- c(0.15,0.15,0.15) #3 together
+
+cols <- c(rgb(0,0,1,alpha=0.5),
+          rgb(0,1,0,alpha=0.5),
+          rgb(1,0,0,alpha=0.5) )
+
+plot(0.5:1.5,0.5:1.5,type='n')
+symbols(xs, ys, circles=radii, inches=FALSE, add=TRUE, fg=cols, bg=cols)          
+
+
+
+
