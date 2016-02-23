@@ -7,6 +7,9 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# rough document with code snippets developed at infohackit 2016
+# see the shiny folder for working app
+
 
 ### phylopic
 
@@ -54,9 +57,14 @@ for (i in 1:50) {
 ### brazil map
 ```{r}
 library(rworldmap)
-
+brazil_map <- getMap()[getMap()$ADMIN=="Brazil",]
+sp::plot(brazil_map)
 
 ```
+
+
+see this for more complicated version :
+http://wallaceinitiative.org/
 
 
 ~ ggplot or base ? 3 circles overlapping
@@ -85,6 +93,168 @@ cols <- c(rgb(0,0,1,alpha=0.5),
 
 plot(0.5:1.5,0.5:1.5,type='n')
 symbols(xs, ys, circles=radii, inches=FALSE, add=TRUE, fg=cols, bg=cols)          
+
+#do i want to make it able to cope with different numbers of species ?
+
+# I want to be able to capture the overlap of the polygons
+
+# perhaps go back to plotting 3 polygons
+# & using sp to calc the overlap of the 3 polygons
+# then I have flexibility to change the polygons later
+#I could maybe even plot the circles in ggplot ...
+
+
+circle_fun <- function(center = c(0,0),r = 1, npoints = 100){
+    tt <- seq(0,2*pi,length.out = npoints)
+    xx <- center[1] + r * cos(tt)
+    yy <- center[2] + r * sin(tt)
+    return(data.frame(x = xx, y = yy))
+}
+
+#And a demonstration of it's use:
+
+circ1 <- circle_fun(c(1,-1),1,npoints = 100)
+#geom_path will do open circles, geom_polygon will do filled circles
+#ggplot(dat,aes(x,y)) + geom_path()
+ggplot(dat,aes(x,y)) + geom_polygon()
+
+#I could make this into a circles_fun that returns columns of x,y & z
+#but then would I be able to calculate the overlap ?
+#I probably need to turn into sp objects to be able to use over ?
+
+# from sp over vignette
+xpol = c(0,1,1,0,0)
+ypol = c(0,0,1,1,0)
+pol = SpatialPolygons(list(
+ Polygons(list(Polygon(cbind(xpol-1.05,ypol))), ID="x1"),
+ Polygons(list(Polygon(cbind(xpol,ypol))), ID="x2"),
+ Polygons(list(Polygon(cbind(xpol,ypol-1.05))), ID="x3"),
+ Polygons(list(Polygon(cbind(xpol+1.05,ypol))), ID="x4"),
+ Polygons(list(Polygon(cbind(xpol+.4, ypol+.1))), ID="x5")
+ ))
+
+pol = SpatialPolygons(list(
+ Polygons(list(Polygon(cbind(xpol,ypol))), ID="x2"),
+ Polygons(list(Polygon(cbind(xpol+0.5,ypol))), ID="x4"),
+ Polygons(list(Polygon(cbind(xpol+.4, ypol+0.3))), ID="x5")
+ ))
+ 
+
+plot(pol)
+
+
+library(rgeos)
+
+#this works to get intersection
+intersections <- gIntersection(pol[1], pol[2])
+
+
+circles <- function(cx = c(1,1.1,1.05), cy = c(1,1,1.2), r = c(1,1,1), npoints = 100){
+
+    polys <- data.frame(x = NULL, y = NULL, z = NULL)
+    
+    for(i in length(cx))
+    {
+     tt <- seq(0,2*pi,length.out = npoints)
+     xx <- cx[i] + r[i] * cos(tt)
+     yy <- cy[i] + r[i] * sin(tt) 
+     
+     poly <- data.frame(x = xx, y = yy, z = i)
+     
+     polys <- rbind( polys, poly )
+    }
+
+    
+    return(polys)
+
+}
+
+circles <- function(cx = c(1,1.1,1.05), cy = c(1,1,1.2), r = c(1,1,1), npoints = 100){
+
+    polys <- data.frame(x = NULL, y = NULL, z = NULL)
+    
+    for(i in length(cx))
+    {
+     tt <- seq(0,2*pi,length.out = npoints)
+     xx <- cx[i] + r[i] * cos(tt)
+     yy <- cy[i] + r[i] * sin(tt) 
+     
+     poly <- data.frame(x = xx, y = yy, z = i)
+     
+     polys <- rbind( polys, poly )
+    }
+
+    
+    return(polys)
+
+}
+
+
+
+circle_fun <- function(center = c(0,0),r = 1, npoints = 100){
+    tt <- seq(0,2*pi,length.out = npoints)
+    xx <- center[1] + r * cos(tt)
+    yy <- center[2] + r * sin(tt)
+    return(data.frame(x = xx, y = yy))
+}
+
+circ1 <- circle_fun(center = c(1,1),r = 1)
+circ1$z <- "c1"
+circ2 <- circle_fun(center = c(1.1,1),r = 1)
+circ2$z <- "c2"
+circ3 <- circle_fun(center = c(1.05,1.2),r = 1)
+circ3$z <- "c3"
+
+circs <- rbind(circ1, circ2, circ3)
+
+ggplot(circs, aes(x,y, fill = z)) + geom_polygon(alpha = 0.5)
+#ggplot(circs,aes(x,y, colour=z)) + geom_path()
+
+ggplot(circ1,aes(x,y, colour=z)) + geom_path()
+
+## problem with the ggplot because circles are joined ...
+
+#convert to sp object
+pol1 <- Polygons(list(Polygon(circ1)), "c1")
+pol2 <- Polygons(list(Polygon(circ2)), "c2")
+pol3 <- Polygons(list(Polygon(circ3)), "c3")
+
+
+pol = SpatialPolygons(list(pol1, pol2, pol3))
+
+#polys <- SpatialPolygons(list(pol1, pol2, pol3))
+sp::plot(polys, border='red')
+
+sp::plot(pol, border='red')
+
+#get intersection between 1 & 2
+intersect1 <- gIntersection(pol[1], pol[2])
+intersect2 <- gIntersection(intersect1, pol[3])
+
+sp::plot(intersect2, border='green', fg='green', add=TRUE)
+
+
+Text :
+Global Warning
+Addressing potential impacts of climate change on biodiversity in Brazil 
+
+Climate change can move species distributions out of protected areas.
+
+
+1. make the borders less ?
+1. fix error of gIntersection ?
+
+
+done 1. how to create circle polygon coords
+done 1. how to plot circle
+done 1. ggplot colour the circles
+done 1. how to get overlap (might need to do 1 on 2 first, then the union of those 2 on 3)
+done 1. how to put into shiny
+done 1. add slider to set the radius
+done 1. I may still want to do plotting in sp to keep easier ?
+
+done 1. add checkboxes for range shift & range move
+1. can I output the stats for % of each sp ?
 
 
 
