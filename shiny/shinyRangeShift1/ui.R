@@ -9,8 +9,13 @@ shinyUI(fluidPage(
   #fluidRow(h1("Global Warning")),
            #helpText("An illustrative example to show how range shifts can lead to loss of species"),
 
-  fluidRow(h2("Climate change can move species distributions out of protected areas."),
-           h3("Change the temperature to see potential effects :")
+  fluidRow(h3("Climate change can move species distributions out of protected areas."),
+           h4("Prototype conceptual model developed at infohackit 2016, Norwich")
+           # column(6, h4("Change the temperature to see potential effects :")),
+           # column(7, sliderInput("temp_rise", "Temperature rise in degrees C :", 
+           #                       min = 1,
+           #                       max = 5, 
+           #                       value = 1))          
            ),  
     
   fluidRow(
@@ -24,9 +29,9 @@ shinyUI(fluidPage(
 #                        )),
 
 
-           sliderInput("temp_rise", "Temperature rise in degrees C :", 
+           sliderInput("temp_rise", "Temperature rise in degrees C :",
                        min = 1,
-                       max = 5, 
+                       max = 5,
                        value = 1),
            
            checkboxInput("range_shrink", "range shrink", TRUE), #var,name

@@ -2,8 +2,8 @@ name: range1
 account: andysouth
 server: shinyapps.io
 appId: 84749
-bundleId: 377803
+bundleId: 378478
 url: https://andysouth.shinyapps.io/range1/
-when: 1456167998.71183
+when: 1456240665.13657
 asMultiple: FALSE
 asStatic: FALSE
