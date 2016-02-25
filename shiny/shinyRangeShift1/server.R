@@ -12,11 +12,6 @@ library(sp)
 #this did make the plots look better
 options(shiny.usecairo=FALSE)
 
-#for me to deploy online
-#library(shinyapps)
-#setwd("C:\\rworldmapNotes\\")
-#deployApp('rworldmapUI')
-
 
 circle_fun <- function(center = c(0,0),r = 1, npoints = 100){
   tt <- seq(0,2*pi,length.out = npoints)
@@ -25,8 +20,7 @@ circle_fun <- function(center = c(0,0),r = 1, npoints = 100){
   return(data.frame(x = xx, y = yy))
 }
 
-#create global vars for 1 degree outlines
-
+#could create global vars for 1 degree outlines
 
 
 shinyServer(function(input, output) {
@@ -35,7 +29,6 @@ shinyServer(function(input, output) {
   # map plot ----
   output$plot_circles <- renderPlot({
   
-    
     
     ## dotted for 1 degree current
     ## plus the protected areas in the middle
@@ -72,6 +65,7 @@ shinyServer(function(input, output) {
         
     sp::plot(polys, border='red', lty=3)
       
+    
     ############################################
     ## now the regions based on the input values
     
